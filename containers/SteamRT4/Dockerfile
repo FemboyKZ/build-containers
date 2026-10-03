@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update -y && apt upgrade -y
 
 # Install Clang 22
-RUN wget -4 -O /etc/apt/keyrings/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
+RUN wget -4 --retry-on-host-error -O /etc/apt/keyrings/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
 RUN echo "deb [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/trixie/ llvm-toolchain-trixie-22 main" >> /etc/apt/sources.list.d/llvm.list
 RUN echo "deb-src [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/trixie/ llvm-toolchain-trixie-22 main" >> /etc/apt/sources.list.d/llvm.list
 RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22
@@ -21,7 +21,7 @@ RUN cd ambuild && python setup.py install
 RUN rm -rf ambuild
 
 # Install Premake5
-RUN wget -O premake.tar.gz https://github.com/premake/premake-core/archive/refs/tags/v5.0.0-beta8.tar.gz
+RUN wget -O --retry-on-host-error premake.tar.gz https://github.com/premake/premake-core/archive/refs/tags/v5.0.0-beta8.tar.gz
 RUN tar -xzf premake.tar.gz
 RUN make -C premake-core-5.0.0-beta8 -f Bootstrap.mak linux
 RUN install premake-core-5.0.0-beta8/bin/release/premake5 /usr/local/bin/premake5
