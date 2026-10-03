@@ -18,9 +18,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build & Publish Docker image for steamrt3 tag
         run: |
-              docker build . -t ghcr.io/source2ze/build-containers:steamrt3 -f containers/SteamRT3-Dockerfile
-              docker push ghcr.io/source2ze/build-containers:steamrt3
+              docker build . -t ghcr.io/femboykz/build-containers:steamrt3 -f containers/SteamRT3/Dockerfile
+              docker push ghcr.io/femboykz/build-containers:steamrt3
       - name: Build & Publish Docker image for steamrt4 tag
         run: |
-              docker build . -t ghcr.io/source2ze/build-containers:steamrt4 -f containers/SteamRT4-Dockerfile
-              docker push ghcr.io/source2ze/build-containers:steamrt4
+              docker build . -t ghcr.io/femboykz/build-containers:steamrt4 -f containers/SteamRT4/Dockerfile
+              docker push ghcr.io/femboykz/build-containers:steamrt4
