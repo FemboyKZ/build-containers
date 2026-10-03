@@ -21,9 +21,9 @@ done
 RUN apt update -y && apt upgrade -y
 
 # Install Clang 22
-RUN echo "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-22 main" >> /etc/apt/sources.list.d/llvm.list
-RUN echo "deb-src http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-22 main" >> /etc/apt/sources.list.d/llvm.list
-RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+RUN wget -4 -O /etc/apt/keyrings/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
+RUN echo "deb [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-22 main" >> /etc/apt/sources.list.d/llvm.list
+RUN echo "deb-src [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-22 main" >> /etc/apt/sources.list.d/llvm.list
 RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22
 RUN ln -sf /usr/bin/clang-22 /usr/bin/clang && ln -sf /usr/bin/clang++-22 /usr/bin/clang++
 
