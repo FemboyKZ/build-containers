@@ -12,12 +12,13 @@ RUN apt update -y && apt upgrade -y
 RUN wget -O /etc/apt/keyrings/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
 RUN echo "deb [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/trixie/ llvm-toolchain-trixie-22 main" >> /etc/apt/sources.list.d/llvm.list
 RUN echo "deb-src [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/trixie/ llvm-toolchain-trixie-22 main" >> /etc/apt/sources.list.d/llvm.list
-RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22 && apt clean -y
+RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22
 RUN ln -sf /usr/bin/clang-22 /usr/bin/clang && ln -sf /usr/bin/clang++-22 /usr/bin/clang++
 
 # Install AMBuild
 RUN git clone https://github.com/alliedmodders/ambuild
 RUN cd ambuild && python setup.py install
+RUN rm -rf ambuild
 
 # Install Premake5
 RUN wget -O premake.tar.gz https://github.com/premake/premake-core/archive/refs/tags/v5.0.0-beta8.tar.gz

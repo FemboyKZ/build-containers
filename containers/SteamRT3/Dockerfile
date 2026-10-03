@@ -24,12 +24,13 @@ RUN apt update -y && apt upgrade -y
 RUN echo "deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-22 main" >> /etc/apt/sources.list.d/llvm.list
 RUN echo "deb-src http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-22 main" >> /etc/apt/sources.list.d/llvm.list
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22 && apt clean -y
+RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22
 RUN ln -sf /usr/bin/clang-22 /usr/bin/clang && ln -sf /usr/bin/clang++-22 /usr/bin/clang++
 
 # Install AMBuild
 RUN git clone https://github.com/alliedmodders/ambuild
 RUN cd ambuild && python setup.py install
+RUN rm -rf ambuild
 
 # Install Premake5
 RUN wget -O premake.tar.gz https://github.com/premake/premake-core/archive/refs/tags/v5.0.0-beta8.tar.gz
