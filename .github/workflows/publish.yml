@@ -7,7 +7,7 @@ on:
 jobs:
   publish-docker-images:
     runs-on: self-hosted
-    if: github.ref == 'refs/heads/main' # Running this job only for main branch
+    if: github.ref == 'refs/heads/master' # Running this job only for main branch
     steps:
       - uses: actions/checkout@v7
       - name: Login to GitHub Container Registry
