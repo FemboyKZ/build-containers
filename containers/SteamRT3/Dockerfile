@@ -33,16 +33,16 @@ RUN cd ambuild && python setup.py install
 RUN rm -rf ambuild
 
 # Install Premake5
-RUN wget --retry-on-host-error -O premake.tar.gz https://github.com/premake/premake-core/archive/refs/tags/v5.0.0-beta8.tar.gz
-RUN tar -xzf premake.tar.gz
-RUN make -C premake-core-5.0.0-beta8 -f Bootstrap.mak linux
-RUN install premake-core-5.0.0-beta8/bin/release/premake5 /usr/local/bin/premake5
-RUN rm -rf premake*
+# RUN wget --retry-on-host-error -O premake.tar.gz https://github.com/premake/premake-core/archive/refs/tags/v5.0.0-beta8.tar.gz
+# RUN tar -xzf premake.tar.gz
+# RUN make -C premake-core-5.0.0-beta8 -f Bootstrap.mak linux
+# RUN install premake-core-5.0.0-beta8/bin/release/premake5 /usr/local/bin/premake5
+# RUN rm -rf premake*
 
 # Install xmake
-RUN curl -fsSL https://xmake.io/shget.text | bash -s v3.1.0
-RUN ln -sf /root/.local/bin/xmake /usr/bin/xmake
-ENV XMAKE_ROOT=y
+# RUN curl -fsSL https://xmake.io/shget.text | bash -s v3.1.0
+# RUN ln -sf /root/.local/bin/xmake /usr/bin/xmake
+# ENV XMAKE_ROOT=y
 
 # Cleanup
 RUN apt clean -y && apt autoremove -y && rm -rf /var/lib/apt/lists/*
