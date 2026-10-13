@@ -1,19 +1,12 @@
-FROM registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk:latest-container-runtime-depot
-LABEL author="FemboyKZ"
-LABEL org.opencontainers.image.description="Docker container used as a build environment for our plugins"
-LABEL org.opencontainers.image.source="https://github.com/FemboyKZ/build-containers"
+FROM registry.gitlab.steamos.cloud/steamrt/steamrt4/sdk:latest-container-runtime-depot AS sdk
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update
-RUN apt update -y && apt upgrade -y
-
-# Install Clang 22
+# Install Clang 22 + libssl-dev:i386 (not part of this SDK)
 RUN wget -4 --retry-on-host-error -O /etc/apt/keyrings/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
 RUN echo "deb [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/trixie/ llvm-toolchain-trixie-22 main" >> /etc/apt/sources.list.d/llvm.list
 RUN echo "deb-src [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/trixie/ llvm-toolchain-trixie-22 main" >> /etc/apt/sources.list.d/llvm.list
-RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22
-RUN ln -sf /usr/bin/clang-22 /usr/bin/clang && ln -sf /usr/bin/clang++-22 /usr/bin/clang++
+RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22 libssl-dev:i386
 
 # Install AMBuild
 RUN git clone https://github.com/alliedmodders/ambuild
@@ -33,4 +26,33 @@ RUN rm -rf ambuild
 # ENV XMAKE_ROOT=y
 
 # Cleanup
-RUN apt clean -y && apt autoremove -y --purge && rm -rf /var/lib/apt/lists/*
+# Builds use about a tenth of the SDK, so everything not reachable from KEEP is purged.
+# A build that needs another system package has to list it here.
+# The x86 entries mirror what clang -m32 selects in the full SDK. The lib32 multilib packages build different binaries.
+# python-is-python3 is the ambuild shebang, sudo refuses to be removed.
+ARG KEEP="clang-22 libstdc++-14-dev libc6-dev binutils \
+    libstdc++-14-dev:i386 libstdc++-14-dev-i386-cross libc6-dev:i386 \
+    libcurl4-openssl-dev libssl-dev libssl-dev:i386 \
+    git python3 python-is-python3 python3-setuptools \
+    ca-certificates curl wget make zip unzip xz-utils sudo"
+RUN apt-mark auto $(dpkg-query -W -f='${binary:Package}\n') > /dev/null \
+    && apt-mark manual $KEEP \
+    && apt autoremove -y --purge \
+    -o APT::AutoRemove::RecommendsImportant=false \
+    -o APT::AutoRemove::SuggestsImportant=false \
+    && apt clean -y \
+    && rm -rf /var/lib/apt/lists/* /var/cache/* /var/log/* /usr/share/doc /usr/share/man /usr/share/locale
+
+# The purged clang package owns /usr/bin/clang, so the links go in after it
+RUN ln -sf /usr/bin/clang-22 /usr/bin/clang && ln -sf /usr/bin/clang++-22 /usr/bin/clang++
+
+# Deleting in a layer on top of the SDK would not shrink the pull, so the result is copied into a fresh image
+FROM scratch
+LABEL author="FemboyKZ"
+LABEL org.opencontainers.image.description="Docker container used as a build environment for our plugins"
+LABEL org.opencontainers.image.source="https://github.com/FemboyKZ/build-containers"
+
+COPY --from=sdk / /
+
+ENV DEBIAN_FRONTEND=noninteractive
+CMD ["/bin/bash"]
