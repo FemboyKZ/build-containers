@@ -33,4 +33,4 @@ RUN rm -rf ambuild
 # ENV XMAKE_ROOT=y
 
 # Cleanup
-RUN apt clean -y && apt autoremove -y && rm -rf /var/lib/apt/lists/*
+RUN apt clean -y && apt autoremove -y --purge && rm -rf /var/lib/apt/lists/*
