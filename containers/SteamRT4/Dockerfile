@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN wget -4 --retry-on-host-error -O /etc/apt/keyrings/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
 RUN echo "deb [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/trixie/ llvm-toolchain-trixie-22 main" >> /etc/apt/sources.list.d/llvm.list
 RUN echo "deb-src [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/trixie/ llvm-toolchain-trixie-22 main" >> /etc/apt/sources.list.d/llvm.list
-RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22 lld-22 libssl-dev:i386
+RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22 lld-22 libclang-rt-22-dev libssl-dev:i386
 
 # Install AMBuild
 RUN git clone https://github.com/alliedmodders/ambuild
@@ -30,7 +30,7 @@ RUN rm -rf ambuild
 # A build that needs another system package has to list it here.
 # The x86 entries mirror what clang -m32 selects in the full SDK. The lib32 multilib packages build different binaries.
 # python-is-python3 is the ambuild shebang, sudo refuses to be removed.
-ARG KEEP="clang-22 lld-22 libstdc++-14-dev libc6-dev binutils \
+ARG KEEP="clang-22 lld-22 libclang-rt-22-dev libstdc++-14-dev libc6-dev binutils \
     libstdc++-14-dev:i386 libstdc++-14-dev-i386-cross libc6-dev:i386 \
     libcurl4-openssl-dev libssl-dev libssl-dev:i386 \
     git python3 python-is-python3 python3-setuptools \
