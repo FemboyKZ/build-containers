@@ -2,11 +2,11 @@ FROM registry.gitlab.steamos.cloud/steamrt/sniper/sdk:latest-container-runtime-d
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install Clang 22
+# Install Clang 22 and LLD
 RUN wget -4 --retry-on-host-error -O /etc/apt/keyrings/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
 RUN echo "deb [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-22 main" >> /etc/apt/sources.list.d/llvm.list
 RUN echo "deb-src [signed-by=/etc/apt/keyrings/apt.llvm.org.asc] http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye-22 main" >> /etc/apt/sources.list.d/llvm.list
-RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22
+RUN apt update -y && apt install --no-install-recommends --no-install-suggests -y clang-22 lld-22
 
 # Install AMBuild
 RUN git clone https://github.com/alliedmodders/ambuild
@@ -30,7 +30,7 @@ RUN rm -rf ambuild
 # A build that needs another system package has to list it here.
 # The x86 entries mirror what clang -m32 selects in the full SDK. The lib32 multilib packages build different binaries.
 # python-is-python3 is the ambuild shebang, sudo refuses to be removed.
-ARG KEEP="clang-22 libstdc++-10-dev libc6-dev binutils \
+ARG KEEP="clang-22 lld-22 libstdc++-10-dev libc6-dev binutils \
     libstdc++-10-dev:i386 libstdc++-10-dev-i386-cross libc6-dev:i386 \
     libcurl4-gnutls-dev libssl-dev libssl-dev:i386 \
     git python3 python-is-python3 python3-setuptools \
@@ -44,7 +44,7 @@ RUN apt-mark auto $(dpkg-query -W -f='${binary:Package}\n') > /dev/null \
     && rm -rf /var/lib/apt/lists/* /var/cache/* /var/log/* /usr/share/doc /usr/share/man /usr/share/locale
 
 # The purged clang package owns /usr/bin/clang, so the links go in after it
-RUN ln -sf /usr/bin/clang-22 /usr/bin/clang && ln -sf /usr/bin/clang++-22 /usr/bin/clang++
+RUN ln -sf /usr/bin/clang-22 /usr/bin/clang && ln -sf /usr/bin/clang++-22 /usr/bin/clang++ && ln -sf /usr/bin/ld.lld-22 /usr/bin/ld.lld
 
 # Deleting in a layer on top of the SDK would not shrink the pull, so the result is copied into a fresh image
 FROM scratch
